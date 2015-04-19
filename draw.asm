@@ -11,6 +11,7 @@ ld hl, C449                 ; Load initial cursor position.
 ld (hl), 00                 ; Draw cursor.
 
 entry_loop:
+call delay
 ld hl, FFF8                 ; Load address of hardward input byte.
 ld e, (hl)                  ; Load input.
 ld a, F0                    ; Setup bit mask for directional pad.
@@ -88,4 +89,14 @@ ret
 move_down:
 inc hl
 dec (hl)                    ; Update cursor position.
+ret
+
+delay:
+ei
+halt
+halt
+halt
+halt
+halt
+halt
 ret
