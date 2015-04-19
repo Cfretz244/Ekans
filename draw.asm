@@ -1,7 +1,7 @@
 entry:
 ld bc, 0168                 ; Number of bytes to write, 320.
 ld hl, C3A0                 ; Address to write to (Screen I/O)
-ld a, 10                    ; Tile identifier to write (Black tile).
+ld a, 20                    ; Tile identifier to write (Black tile).
 call 36E0                   ; Call memset.
 ld hl, D53A                 ; Load address of cursor x position.
 ld (hl), 09                 ; Set x position to 10 and increment the pointer.
@@ -21,9 +21,9 @@ jr entry_loop               ; No direction was pressed. Check again.
 
 direction_pressed:
 ld hl, D53A                 ; Load address of cursor X position.
-ld b, (hl)                 ; Load cursor X position and increment pointer.
+ld c, (hl)                 ; Load cursor X position and increment pointer.
 inc hl
-ld c, (hl)                  ; Load cursor Y position.
+ld b, (hl)                  ; Load cursor Y position.
 ld hl, C3A0                 ; Load base address for screen I/O.
 call resolve                ; Resolve where to write on the screen.
 call paint                  ; Paint the appropriate tile appropriately.
@@ -59,7 +59,7 @@ lighten:
 ld b, 00                    ; Load identifier for a white tile.
 jr draw
 darken:
-ld b, 10                    ; Load identifier for a black tile.
+ld b, 20                    ; Load identifier for a black tile.
 draw:
 ld (hl), b                  ; Draw the tile.
 ret
@@ -84,11 +84,11 @@ dec (hl)                    ; Update cursor position.
 ret
 move_up:
 inc hl
-inc (hl)                    ; Update cursor position.
+dec (hl)                    ; Update cursor position.
 ret
 move_down:
 inc hl
-dec (hl)                    ; Update cursor position.
+inc (hl)                    ; Update cursor position.
 ret
 
 delay:
