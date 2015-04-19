@@ -17,6 +17,9 @@ ld e, (hl)                  ; Load input.
 ld a, F0                    ; Setup bit mask for directional pad.
 and e                       ; Perform comparison.
 jr nz, direction_pressed    ; Jump out if a direction was pressed.
+ld a, 08
+and e
+jr nz, entry
 jr entry_loop               ; No direction was pressed. Check again.
 
 direction_pressed:
