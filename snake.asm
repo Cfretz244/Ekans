@@ -1,3 +1,27 @@
+setup:
+ld bc, 12
+ld hl, D540
+ld a, 00
+call 36E0
+ld a, 08
+ld (DAA0), a
+ld (DAA1), a
+
+input_tick:
+ld hl, FFF8
+push af
+and (hl)
+jr z, down_pressed
+pop af
+rrca
+push af
+and (hl)
+jr z, up_pressed
+pop af
+rrca
+push af
+and (hl)
+
 draw:
 call wipe       ; Black-out entire screen.
 xor a           ; Clear out the value in A.
@@ -53,13 +77,4 @@ ld bc, 0168     ; Set the number of bytes we're writing (320).
 ld hl, C3A0     ; Set the base address (Screen I/O).
 ld a, 10        ; Set data to write (black tile).
 call 36E0       ; Call memcpy.
-ret
-
-RngGen:         ; Generates a "random" byte and stores it in the E register.
-push af
-ld hl, $DA45
-ld a, FF
-and (hl)
-ld e, a
-pop af
 ret
