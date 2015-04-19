@@ -4,9 +4,11 @@ ld hl, C3A0                 ; Address to write to (Screen I/O)
 ld a, 10                    ; Tile identifier to write (Black tile).
 call 36E0                   ; Call memset.
 ld hl, D53A                 ; Load address of cursor x position.
-ldi (hl), 10                ; Set x position to 10 and increment the pointer.
-ld (hl), 9                  ; Set y position to 9.
-halt
+ld (hl), 09                 ; Set x position to 10 and increment the pointer.
+inc hl
+ld (hl), 08                 ; Set y position to 9.
+ld hl, C449                 ; Load initial cursor position.
+ld (hl), 00                 ; Draw cursor.
 
 entry_loop:
 ld hl, FFF8                 ; Load address of hardward input byte.
@@ -18,7 +20,8 @@ jr entry_loop               ; No direction was pressed. Check again.
 
 direction_pressed:
 ld hl, D53A                 ; Load address of cursor X position.
-ldi b, (hl)                 ; Load cursor X position and increment pointer.
+ld b, (hl)                 ; Load cursor X position and increment pointer.
+inc hl
 ld c, (hl)                  ; Load cursor Y position.
 ld hl, C3A0                 ; Load base address for screen I/O.
 call resolve                ; Resolve where to write on the screen.
@@ -30,20 +33,26 @@ resolve:
 xor a                       ; Reset A to zero.
 cp b                        ; Compare B with a.
 jr z, resolve_x             ; B has been reduced to zero. Row has been identified.
-add hl, 14                  ; B still has a positive value. Jump forward another row.
+push bc
+ld bc, 0014
+add hl, bc                  ; B still has a positive value. Jump forward another row.
+pop bc
 dec b                       ; Decrease B by one.
 jr resolve                  ; Run again.
 resolve_x:
-add hl, c                   ; Add the X coordinate to get the proper tile.
+push bc
+ld b, 00
+add hl, bc                   ; Add the X coordinate to get the proper tile.
+pop bc
 ret
 
 paint:
 ld a, 01                    ; Load the bitmask for the A button.
 and e                       ; Check if the A button was pressed.
-jr z, lighten               ; Button was pressed, paint a white tile.
+jr nz, lighten               ; Button was pressed, paint a white tile.
 ld a, 02                    ; Load the bitmask for the B button.
 and e                       ; Check if the B button was pressed.
-jr z, darken                ; Button was pressed, paint a black tile.
+jr nz, darken                ; Button was pressed, paint a black tile.
 ret
 lighten:
 ld b, 00                    ; Load identifier for a white tile.
